@@ -1,0 +1,3864 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "SStats.net - Football API",
+    "description": "API футбольных матчей, доматчевые и live коэффициенты, статистика, профиты, Glicko 2\r\n\r\nВесь функционал API бесплатен, с ограничением по количеству запросов. \r\nБез api ключа ограничение 300 в минуту запросов на всех пользователей, или 30 запросов в минуту на 1 IP адрес.\r\n\r\n[Введение в API](https://sstats.net/api)",
+    "contact": {
+      "name": "Поддержка",
+      "url": "https://vk.com/sstats_net"
+    },
+    "version": "0.9.7.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.sstats.net",
+      "description": "SStats.net API"
+    }
+  ],
+  "paths": {
+    "/Account/Info": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Аккаунт",
+        "description": "Получение данных о текущем авторизированном пользователе",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfAccountInfo"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiAuthScheme": []
+          }
+        ]
+      }
+    },
+    "/Excel/Delux": {
+      "get": {
+        "tags": [
+          "Excel"
+        ],
+        "summary": "Delux",
+        "description": "Запрос используется в excel таблице для прогнозирования футбольных матчей DeluX_API-based.\nЭта таблица является модификацией таблицы *DeluX_plus IncoProrok.xlsm*, в которой парсер сайта Flashscore заменен на API сайта sstats.net\n            \nЗапрос за раз выгружает все необходимые данные, которая требует таблица для анализа матча\n\nПодробнее о таблице и использованию запроса в руководстве [Excel Delux](https://sstats.net/posts/api-excel-delux)\n            \nДля получения данных по конкретному матчу необходимо указать *gameId*\nДля получения данных за день, необходимо указать *dayOffset*",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "dayOffset",
+            "in": "query",
+            "description": "День. 0 - сегодня, -1 - вчера, -2 - позавчера, 1 - завтра, 2 - после завтра и т.д. Диапазон: [-1000, 30]",
+            "schema": {
+              "maximum": 30,
+              "minimum": -1000,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "description": "Часовой пояс",
+            "schema": {
+              "maximum": 12,
+              "minimum": -12,
+              "type": "integer",
+              "format": "int32",
+              "default": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/Excel/FootballCalc": {
+      "get": {
+        "tags": [
+          "Excel"
+        ],
+        "summary": "Football calculation",
+        "description": "Запрос, используемой в excel таблице для прогнозирования матчей football-calculation-table_API-based.xlsb\n            \nЭта таблица является модифицированной версией football-calculation-table-v.2.1-by-kish.xlsb\n\nДля получения данных по конкретному матчу необходимо указать *gameId*\nДля получения данных за день, необходимо указать *dayOffset*",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "query",
+            "description": "Идентифиатор матча sstats.net",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "dayOffset",
+            "in": "query",
+            "description": "День. 0 - сегодня, -1 - вчера, -2 - позавчера, 1 - завтра, 2 - после завтра и т.д. Диапазон: [-1000, 30]",
+            "schema": {
+              "maximum": 30,
+              "minimum": -1000,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "description": "Часовой пояс",
+            "schema": {
+              "maximum": 12,
+              "minimum": -12,
+              "type": "integer",
+              "format": "int32",
+              "default": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Excel/Results": {
+      "get": {
+        "tags": [
+          "Excel"
+        ],
+        "summary": "Результаты",
+        "description": "Извлечение результатов матчей\n            \n            \nОтвет содержит таблицу  \n`Id,Date,HomeHalfTimeScore,AwayHalfTimeScore,HomeFullTimeScore,AwayFullTimeScore,Ended`",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "список матчей через запятую. Максимум 500 значений",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "header",
+            "in": "query",
+            "description": "Включить заголовок в ответ",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/Games/list": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Список матчей",
+        "description": "Извлечение списка матчей. Данные о каждом матче возвращаются в сокращенном варианте (Id, время, статус, счет, названия команд их их ID, сезон, тур, коэффициенты).  \nКоэффициенты в сокращенном варианте: 1X2, Total. (на момент ближе к закрытию линии)\n\nДля получения полной информации о конкретном матче используется [/games/{id}](#tag/games/get/Games/{id})\n            \nОдним запросом можно извлечь не более 1000 матчей. Чтобы извлечь остальные, нужно использовать несколько запросов, увеличивая &offset=N.\n\n**Например**:  \n`&offset=0&limit=10` - отобразит первые 10 матчей  \n`&offset=10&limit=10` - отобразит следующие 10 матчей (пропуская первые 10)\n            \n---\n\n#### Примеры:\nИзвлечение всех матчей по id лиги и году сезона  \nhttps://api.sstats.net/games/list?leagueid=183&year=2022\n\nИзвлечение всех матчей по id сезона 1DC9CB60-0958-11EE-B462-879841420925  \nhttps://api.sstats.net/games/list?seasonUid=1DC9CB60-0958-11EE-B462-879841420925\n\nИзвлечение всех матчей по id лиги и временному интервалу  \nhttps://api.sstats.net/games/list?leagueid=183&from=2022-10-30&to=2022-12-30\n\nПредстоящие матчи команды  \nhttps://api.sstats.net/games/list?upcoming=true&team=529\n\nПрошедшие матчи между командами когда они играли друг с другом (Head 2 Head)  \nhttps://api.sstats.net/games/list?ended=true&bothTeams=529,541",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "description": "Id матча. Один или несколько через запятую.",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\d+(?:,\\d+)*$",
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": "123 или 123,345"
+          },
+          {
+            "name": "FlashId",
+            "in": "query",
+            "description": "Id матча c Flashscore. Один или несколько через запятую.\n<example>123 или 123,345</example>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "LeagueId",
+            "in": "query",
+            "description": "Id лиги\n<remarks>Список лиг можно получить через <code>/leagues</code></remarks>",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SeasonUid",
+            "in": "query",
+            "description": "Уникальный идентификатор сезона",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Year",
+            "in": "query",
+            "description": "Год сезона",
+            "schema": {
+              "maximum": 2070,
+              "minimum": 2011,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Date",
+            "in": "query",
+            "description": "Конкретная дата. В выборку будут включены все матчи за выбранный день. Чтобы указать часовой пояс, используйте параметр <code>TimeZone</code>.\n<example>Например: 2025-06-02</example>",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "From",
+            "in": "query",
+            "description": "Начальная дата. Если указана только дата без времени, то будут включены все матчи за текущую дату, начиная с полуночи.\nЕсли не указывается время с часовым поясом (2025-06-17T14:23:30+02:00), то часовой пояс необходимо передать отдельно в параметре <code>TimeZone</code><remarks>\nДата + время + часовой пояс: 2025-06-17T14:23:30+02:00 \nДата + время: 2025-06-17T14:23:30\nДата + время (без секунд): 2025-06-17T14:23\nДата: 2025-06-17</remarks>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "To",
+            "in": "query",
+            "description": "Конечная дата. Фильтруются все матчи строго до этой даты. Если указана только дата, без времени, то в выборку включаются все матчи до полуночи указанной даты.\nДля всех дат, где не указан часовой пояс (+02:00) необходимо указать часовой пояс отдельно в параметре <code>TimeZone</code>\nНапример: если To = 2025-06-02, то в выборку попадут все матчи до  2025-06-02 00:00:00. Т.е матчи за само 2025-06-02 уже выборку не попадают\n<remarks>\nДата + время + часовой пояс: 2025-06-17T14:23:30+02:00 \nДата + время: 2025-06-17T14:23:30\nДата + время (без секунд): 2025-06-17T14:23\nДата: 2025-06-17</remarks>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Status",
+            "in": "query",
+            "description": "Статус (см [таблицу статусов](#tag/games/get/Games/{id}))",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "uint8"
+            }
+          },
+          {
+            "name": "HomeTeam",
+            "in": "query",
+            "description": "Id команды хозяев (один, или несколько через запятую)\n<example>123 или 123,456</example>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\d+(?:,\\d+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AwayTeam",
+            "in": "query",
+            "description": "Id команды гостей (один, или несколько через запятую)\n<example>123 или 123,456</example>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\d+(?:,\\d+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Id одной из команд (один, или несколько через запятую).\n<remarks>Если указано несколько Id, то выборку попадут все матчи, где хотя бы одна из команд в это списке</remarks><example>123 или 123,456</example>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\d+(?:,\\d+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "BothTeams",
+            "in": "query",
+            "description": "Id двух команд через запятую. Матчи двух команд между собой\n<example>123,456</example>",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^\\d+,\\d+$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Ended",
+            "in": "query",
+            "description": "Завершенные матчи (8, 9, 10, 17, 18). Учитывается только True, False не учитывается",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Live",
+            "in": "query",
+            "description": "Лайв матчи (статусы 3, 4, 5, 6, 7, 11, 18, 19). Учитывается только True, False не учитывается",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Upcoming",
+            "in": "query",
+            "description": "Предстоящие матчи (дата начала матча больше текущего времени + статус: 1,2). Учитывается только True, False не учитывается",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Today",
+            "in": "query",
+            "description": "Матчи за сегодня. Учитывается только True, False не учитывается",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "description": "Пропустить указанное количество матчей от начала выборки. По умолчанию = 0\n<remarks>Количество матчей выводимое за раз ограничено лимитом 1000 матчей. Чтобы извлечь остальные матчи, используется Offset c указанием количества, которое надо пропустить</remarks><example><code>offset=2000</code> - пропустить первые 2000 матчей и получить следущие 1000</example>",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Ограничить выборку указанным количеством матчей (от 1 до 1000)",
+            "schema": {
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Order",
+            "in": "query",
+            "description": "Сортировать по убыванию (Order=-1) или по возрастанию (Order=1) даты начала матча",
+            "schema": {
+              "maximum": 1,
+              "minimum": -1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "TimeZone",
+            "in": "query",
+            "description": "Ваш часовой пояс (от -12 до 12). По умолчанию = 3",
+            "schema": {
+              "maximum": 12,
+              "minimum": -12,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaGame[]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Games/{id}": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Данные матча",
+        "description": "Получить полные данные о конкретном матче\n            \nМожно передать как числовой Id, использующийся в SStats.net так и строковый Id с Flashscore.com\n            \n### Статусы матча\n\n| Код | Описание                             |\n|-----| -------------------------------------|\n| 1   | Дата матча ещё не объявлена          |\n| 2   | Матч ещё не начался                  |\n| 3   | Начало первого тайма                 |\n| 4   | Перерыв между таймами                |\n| 5   | Начало второго тайма                 |\n| 6   | Дополнительное время                 |\n| 7   | Идёт серия пенальти                  |\n| 8   | Матч завершён                        |\n| 9   | Матч завершён после доп. времени     |\n| 10  | Матч завершён после серии пенальти   |\n| 11  | Перерыв в дополнительном времени     |\n| 12  | Матч приостановлен                   |\n| 13  | Матч прерван                         |\n| 14  | Матч перенесён                       |\n| 15  | Матч отменён                         |\n| 17  | Техническое поражение                |\n| 18  | Победа без игры (соперник не явился) |\n| 19  | Матч в процессе                      |",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "sstats.net ID или Flashscore ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaGameFull"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Games/glicko/{id}": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Glicko 2",
+        "description": "Рейтинг Glicko 2 и предсказание вероятностей победы команд",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id матча. Sstats Id в виде числа или Flashscore Id в виде строки",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiGameGlicko"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Games/query-games": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Расширенный поиск",
+        "description": "Извлечение матчей на основе сложных многоуровневых логических условий. \n            \nУсловие использует SQL подобный синтаксис\n\nУсловие представляет собой комбинацию логических выражений, которые в свою очередь состоят из полей и математических знаков.\n\nПример условия:  \n<code>League = 39 AND (Year = 2023 OR Year = 2024) AND Winner1 > 1.1 AND Winner1 <= 1.3</code>  \nЭтот запрос выводит все матчи лиги с идентификатором 30 (Английская премьер лига) в сезонах 2023 и 2024,\nу которых коэффициент на победу команды хозяев находится в промежутке от 1.1 до 1.3 (включительно)\n            \n            \n**Field** настраивает выводимые поля  \n**Order** настраивает поля сортировки\n            \n\nЗапрос отправляется в формате POST c типом application/json, в теле которого содержится json с указанным объектом\n            \n#### Подробное руководство по продвинутым запросам [➔ Перейти](https://sstats.net/posts/api-query-games)\n---\n\nПример содержимого body запроса:  \n```json\n{\n    \"Condition\" : \"League = 39 AND (Year = 2023 OR Year = 2024) AND Winner1 > 1.1 AND Winner1 <= 1.3\",\n    \"Fields\" : [\"Id\",\"Date\",\"HomeTeamName\",\"AwayTeamName\",\"ScoreHomeFT\",\"ScoreAwayFT\", \"Winner1\", \"WinnerX\", \"Winner2\"],\n    \"Format\" : \"csv\"\n}\n``` ",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryGamesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryGamesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryGamesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {},
+              "text/csv": {}
+            }
+          }
+        }
+      }
+    },
+    "/Games/season-table": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Таблица сезона",
+        "description": "Возвращает турнирную таблицу указанной лиги за выбранный сезон. \n\nТаблица формируется на основе результатов завершенных матчей и включает статистику команд:\n- Позицию в турнире\n- Количество игр, побед, ничьих, поражений\n- Забитые и пропущенные голы\n- Очки и другие показатели\n\n**Форматы ответа:**\n- `JSON` (по умолчанию) - структурированные данные для программного использования\n- `CSV` - табличный формат для экспорта в Excel или другие приложения\n\n**Дополнительные возможности:**\n- Ограничение количества записей через параметр `limit`\n- Выбор конкретных полей для CSV через параметр `fields`\n- Сортировка по любому полю через параметр `orderField`\n            \n**Доступные поля для параметра `fields`:**\n\n| Название | Описание |\n|----------|----------|\n| TeamId | ID команды |\n| TeamName | Название команды |\n| TotalGames | Всего игр |\n| Wins | Победы |\n| Draws | Ничьи |\n| Loss | Поражения |\n| GoalsScored | Забитые голы |\n| GoalsMissed | Пропущенные голы |\n| Points | Очки |\n| Over25TotalGames | Игры с тоталом больше 2.5 |\n| Under25TotalGames | Игры с тоталом меньше 2.5 |\n| Over25TotalHomeGames | Домашние игры с тоталом больше 2.5 |\n| Under25TotalHomeGames | Домашние игры с тоталом меньше 2.5 |\n| Over25TotalAwayGames | Гостевые игры с тоталом больше 2.5 |\n| Under25TotalAwayGames | Гостевые игры с тоталом меньше 2.5 |\n| HomeGames | Домашние игры |\n| AwayGames | Гостевые игры |\n| HomeWins | Домашние победы |\n| AwayWins | Гостевые победы |\n| HomeDraws | Домашние ничьи |\n| AwayDraws | Гостевые ничьи |\n| HomeLoss | Домашние поражения |\n| AwayLoss | Гостевые поражения |\n| HomeScored | Голы в домашних играх |\n| AwayScored | Голы в гостевых играх |\n| HomeMissed | Пропущенные голы в домашних играх |\n| AwayMissed | Пропущенные голы в гостевых играх |\n| HomePoints | Очки в домашних играх |\n| AwayPoints | Очки в гостевых играх |\n| ScoreDiff | Разность голов |\n| ScoreDiffHome | Разность голов в домашних играх |\n| ScoreDiffAway | Разность голов в гостевых играх |\n| Rank | Место в турнирной таблице |\n| HomeRank | Место в домашней таблице |",
+        "parameters": [
+          {
+            "name": "league",
+            "in": "query",
+            "description": "Идентификатор лиги/турнира",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Год сезона",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Максимальное количество матчей для расчета таблицы (0 = без ограничений)",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Формат ответа: \"json\" (по умолчанию) или \"csv\"",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Список полей через запятую для CSV формата (например: \"TeamName,Points,Wins\")",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "orderField",
+            "in": "query",
+            "description": "Поле для сортировки. Для убывающей сортировки добавьте \"-\" перед названием поля",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {},
+              "text/csv": {}
+            }
+          }
+        }
+      }
+    },
+    "/Games/text-summary": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Текстовая сводка",
+        "description": "Генерирует детальную текстовую сводку по футбольному матчу, включающую:\n\n- **Букмекерские коэффициенты** на все основные исходы (победа, ничья, тоталы)\n- **Ожидаемые голы** (xG) по оценкам букмекеров\n- **Анализ прибыльности** различных типов ставок на основе исторических данных\n- **Статистику команд**: проценты побед/ничьих/поражений, средние коэффициенты\n- **Голевую статистику**: среднее количество забитых/пропущенных голов, точность прогнозов букмекеров\n\nАнализ основан на предыдущих матчах команд с возможностью фильтрации по лиге и типу матчей (дома/в гостях).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Уникальный идентификатор футбольного матча",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Период анализа: количество последних матчей для расчета статистики (по умолчанию 1)",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "sameLeague",
+            "in": "query",
+            "description": "Учитывать только матчи из той же лиги что и анализируемый матч (по умолчанию true)",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "homeAway",
+            "in": "query",
+            "description": "Учитывать только домашние матчи для хозяев и гостевые для гостей (по умолчанию false)",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {},
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/Games/profits": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "summary": "Калькуляция прибыли",
+        "description": "**Калькуляция прибыли по видам ставок**\n\nАнализирует историческую прибыльность различных видов ставок для домашней и выездной команд на основе их предыдущих матчей.\n\nМетод возвращает детальную статистику по прибыльности ставок:\n- **Полный матч** - анализ ставок за весь матч\n- **Первый тайм** - анализ ставок за первую половину\n- **Второй тайм** - анализ ставок за вторую половину\n\nДля каждого типа ставок показывается:\n- Общая прибыль/убыток\n- История изменения прибыли\n- Количество проанализированных игр\n- Количество выигрышных ставок\n\nПоддерживается гибкая фильтрация исторических данных для более точного анализа.",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "query",
+            "description": "Уникальный идентификатор матча для анализа",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "thisLeague",
+            "in": "query",
+            "description": "Учитывать только игры в рамках той же лиги (по умолчанию: false)",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "homeAway",
+            "in": "query",
+            "description": "Учитывать только домашние игры для домашней команды и выездные для выездной (по умолчанию: false)",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sameGames",
+            "in": "query",
+            "description": "Учитывать только игры с похожими показателями xG (expected goals) - разница не более 0.2 (по умолчанию: false)",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "bookieId",
+            "in": "query",
+            "description": "Идентификатор конкретного букмекера для анализа коэффициентов (опционально)",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Максимальное количество предыдущих игр для анализа (по умолчанию: 25, диапазон: 5-100)",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiMatchProfit"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Leagues": {
+      "get": {
+        "tags": [
+          "Leagues"
+        ],
+        "summary": "Список",
+        "description": "Список всех лиг и их сезонов",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaLeagueWithSeasons[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Ls/List": {
+      "get": {
+        "tags": [
+          "Ls"
+        ],
+        "summary": "Список матчей",
+        "description": "Получение списка футбольных матчей с гибкими возможностями фильтрации и сортировки.\n\n**Основные возможности:**\n- Поиск по конкретным матчам, лигам, сезонам и командам\n- Фильтрация по временным периодам (конкретная дата или диапазон)\n- Отбор матчей по статусу: завершенные, текущие (лайв) или предстоящие\n- Пагинация результатов (до 1000 матчей за запрос)\n- Сортировка по дате проведения матча\n\n**Примеры использования:**\n- `?Date=2025-06-21` - все матчи за конкретный день\n- `?From=2025-06-01&To=2025-06-30` - матчи за период\n- `?LeagueId=england/premier-league&Ended=true` - завершенные матчи лиги\n- `?Team=arsenal/hA1Zm19f&Live=true` - текущие матчи команды\n- `?BothTeams=villa/ALztxK6e,chelsea/4fGZN2oK` - матчи между двумя командами\n\n⚠️ **Обязательно** укажите хотя бы один параметр фильтрации, иначе запрос будет отклонен.\n            \n #### Статусы матча\n| Id | Название |\n|----|----------|\n| 1 | Не начался |\n| 45 | К завершению |\n| 42 | Ожидание обновлений |\n| 2 | В прямом эфире |\n| 12 | Первый тайм |\n| 13 | Второй тайм |\n| 6 | Дополнительное время |\n| 7 | Пенальти |\n| 46 | Технический перерыв |\n| 3 | Завершён |\n| 10 | После дополнительного времени |\n| 11 | После пенальти |\n| 9 | Техническая победа |\n| 43 | Отложен |\n| 36 | Прерван |\n| 5 | Отменён |\n| 54 | Присуждён |",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "description": "Id матча. Один или несколько через запятую.",
+            "schema": {
+              "maxLength": 300,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": "000agg7D или 000agg7D,zZKMD6Z6"
+          },
+          {
+            "name": "LeagueId",
+            "in": "query",
+            "description": "Id лиги\n<remarks>Список лиг можно получить через <code>/Ls/Leagues</code></remarks>",
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SeasonId",
+            "in": "query",
+            "description": "Уникальный идентификатор сезона",
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Years",
+            "in": "query",
+            "description": "Года сезона (Например: 2024-2025)",
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": "2024-2025"
+          },
+          {
+            "name": "Date",
+            "in": "query",
+            "description": "Конкретная дата. В выборку будут включены все матчи за выбранный день. Чтобы указать часовой пояс, используйте параметр <code>TimeZone</code>.\n<example>Например: 2025-06-02</example>",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "From",
+            "in": "query",
+            "description": "Начальная дата. Если указана только дата без времени, то будут включены все матчи за текущую дату, начиная с полуночи.\nЕсли не указывается время с часовым поясом (2025-06-17T14:23:30+02:00), то часовой пояс необходимо передать отдельно в параметре <code>TimeZone</code><remarks>\nДата + время + часовой пояс: 2025-06-17T14:23:30+02:00 \nДата + время: 2025-06-17T14:23:30\nДата + время (без секунд): 2025-06-17T14:23\nДата: 2025-06-17</remarks>",
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "To",
+            "in": "query",
+            "description": "Конечная дата. Фильтруются все матчи строго до этой даты. Если указана только дата, без времени, то в выборку включаются все матчи до полуночи указанной даты.\nДля всех дат, где не указан часовой пояс (+02:00) необходимо указать часовой пояс отдельно в параметре <code>TimeZone</code>\nНапример: если To = 2025-06-02, то в выборку попадут все матчи до  2025-06-02 00:00:00. Т.е матчи за само 2025-06-02 уже выборку не попадают\n<remarks>\nДата + время + часовой пояс: 2025-06-17T14:23:30+02:00 \nДата + время: 2025-06-17T14:23:30\nДата + время (без секунд): 2025-06-17T14:23\nДата: 2025-06-17</remarks>",
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "pattern": "^\\w+(?:,\\w+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Status",
+            "in": "query",
+            "description": "Статус",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "uint8"
+            }
+          },
+          {
+            "name": "HomeTeam",
+            "in": "query",
+            "description": "Id команды хозяев (один, или несколько через запятую)\n<example>jk-arsenal/MgkAqSU0 или jk-arsenal/MgkAqSU0,villa/ALztxK6e</example>",
+            "schema": {
+              "maxLength": 300,
+              "minLength": 0,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AwayTeam",
+            "in": "query",
+            "description": "Id команды гостей (один, или несколько через запятую)\n<example>123 или 123,456</example>",
+            "schema": {
+              "maxLength": 300,
+              "minLength": 0,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Id одной из команд (один, или несколько через запятую).\n<remarks>Если указано несколько Id, то выборку попадут все матчи, где хотя бы одна из команд в это списке</remarks><example>123 или 123,456</example>",
+            "schema": {
+              "maxLength": 300,
+              "minLength": 0,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "BothTeams",
+            "in": "query",
+            "description": "Id двух команд через запятую. Матчи двух команд между собой\n<example>123,456</example>",
+            "schema": {
+              "maxLength": 300,
+              "minLength": 0,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Ended",
+            "in": "query",
+            "description": "Завершенные матчи (8, 9, 10, 17, 18)",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Live",
+            "in": "query",
+            "description": "Лайв матчи (статусы 3, 4, 5, 6, 7, 11, 18, 19)",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Upcoming",
+            "in": "query",
+            "description": "Предстоящие матчи (дата начала матча больше текущего времени + статус: 1,2)",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "description": "Пропустить указанное количество матчей от начала выборки. По умолчанию = 0\n<remarks>Количество матчей выводимое за раз ограничено лимитом 1000 матчей. Чтобы извлечь остальные матчи, используется Offset c указанием количества, которое надо пропустить</remarks><example><code>offset=2000</code> - пропустить первые 2000 матчей и получить следущие 1000</example>",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Ограничить выборку указанным количеством матчей (от 1 до 1000)",
+            "schema": {
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Order",
+            "in": "query",
+            "description": "Сортировать по убыванию (Order=-1) или по возрастанию (Order=1) даты начала матча",
+            "schema": {
+              "maximum": 1,
+              "minimum": -1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "TimeZone",
+            "in": "query",
+            "description": "Ваш часовой пояс (от -12 до 12). По умолчанию = 3",
+            "schema": {
+              "maximum": 12,
+              "minimum": -12,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Ls/Teams": {
+      "get": {
+        "tags": [
+          "Ls"
+        ],
+        "summary": "Команды",
+        "description": "Поиск команды по заданным критериям поиска.\n\n**Параметры поиска:**\n- Поиск выполняется по одному из параметров в порядке приоритета: `uid` → `id` → `name`\n- При поиске по названию используется частичное совпадение (содержит указанную строку)\n- Возвращается максимум 100 команд\n\n**Обязательные условия:**\n- Должен быть указан хотя бы один из параметров поиска",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "Уникальный идентификатор команды (GUID). Имеет наивысший приоритет при поиске",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "default": null
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Строковый идентификатор команды. Используется если не указан uid",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Название команды или его часть для поиска. Используется если не указаны uid и id",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Ls/Leagues": {
+      "get": {
+        "tags": [
+          "Ls"
+        ],
+        "summary": "Лиги",
+        "description": "Получение списка футбольных лиг с возможностью фильтрации по различным критериям.\n\n**Варианты использования:**\n- Без параметров - возвращает все доступные лиги\n- По GUID - получение конкретной лиги (приоритетный поиск)\n- По ID - поиск лиги по строковому идентификатору  \n- По названию - поиск лиг, содержащих указанную подстроку (регистр не учитывается)\n\n**Приоритет фильтров:** GUID > ID > название\n\nЕсли указан GUID, остальные параметры игнорируются. Фильтры по ID и названию могут применяться совместно.",
+        "parameters": [
+          {
+            "name": "guid",
+            "in": "query",
+            "description": "Уникальный идентификатор лиги (GUID). При указании возвращается только одна конкретная лига",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "default": null
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Строковый идентификатор лиги для точного поиска",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Часть названия лиги для поиска (поиск по подстроке, регистр не учитывается)",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Ls/Seasons": {
+      "get": {
+        "tags": [
+          "Ls"
+        ],
+        "summary": "Сезоны",
+        "description": "Возвращает список всех сезонов для указанной футбольной лиги.\n\nМетод позволяет получить информацию о сезонах, используя один из двух способов идентификации лиги:\n- По уникальному идентификатору (`leagueUid`) \n- По строковому идентификатору (`leagueId`)\n\n**Примечание:** Необходимо указать хотя бы один из параметров идентификации лиги.",
+        "parameters": [
+          {
+            "name": "leagueUid",
+            "in": "query",
+            "description": "Уникальный идентификатор лиги в формате GUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "leagueId",
+            "in": "query",
+            "description": "Строковый идентификатор лиги (альтернатива leagueUid)",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Ls/GameInfo": {
+      "get": {
+        "tags": [
+          "Ls"
+        ],
+        "summary": "Матч",
+        "description": "Возвращает детальную информацию о футбольном матче по его идентификатору.\n\n**Включает:**\n- Основные данные матча (команды, счет, статус, время)\n- Букмекерские коэффициенты (если доступны)\n- События матча (голы, карточки, замены и др.)\n\n**Примеры использования:**\n- Отображение подробной информации о матче в приложении\n- Получение актуальных коэффициентов для ставок\n- Просмотр хронологии событий матча",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Уникальный идентификатор футбольного матча",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/bookmakers": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "Букмекеры",
+        "description": "Справочник букмекеров и их идентификаторов",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaBookmaker[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/{gameId}": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "Доматчевые коэффициенты",
+        "description": "Полный список всех коэффициентов всех букмекеров.\n            \nПо умолчанию возвращаются коэффициенты закрытия (за несколько минут (15-30) до начала матча)",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "bookmakerId",
+            "in": "query",
+            "description": "идентификатор букмекера (один или несколько, через запятую). Например: <code>4,5</code>",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "opening",
+            "in": "query",
+            "description": "коэффициенты открытия",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaBookmakerOdds[]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/live/{gameId}": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "Live коэффициенты",
+        "description": "Коэффициенты актуальные в реальном времени, либо последнее обновление на конец матча\n            \nБукмекер: Bet365\n            \nЛайв коэффициенты обновляются раз в 5-60 секунд\n            \nЧтобы за раз отслеживать все матчи, где изменились коэффициенты, используйте [/updates-only](#tag/odds/get/Odds/live-changes/{gameId}/updates-only)",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "description": "Идентификатор матча",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaLiveOdds"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/live-changes/{gameId}/updates-only": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "Метки live обновлений",
+        "description": "Время последнего обновления (актуальности) Live коэффициентов\n            \nПередайте список Id матчей через запятую.\nНапример: `1100303,1100304`. (Максимально 100 матчей)\n            \nВозвращается Id матча и время последнего обновления Live коэффициентов\n            \nИспользуйте этот метод вместе с [odds/live-changes](#tag/odds/get/Odds/live-changes/{gameId}) чтобы извлекать весь список коэффициентов только по необходимости\n            \nЛайв коэффициенты обновляются раз в 5-60 секунд",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "идентификатор матча (один или несколько через запятую)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 300,
+              "minLength": 0,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiLiveOddsLastUpdate[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/live-changes/{gameId}": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "История Live коэффициентов ",
+        "description": "История изменений Live коэффициентов во время матча\n\nБукмекер: Bet365\n\n**Примечание**  \nВ заголовках ответа возвращается `Last-Modified`, который содержит время последнего изменения коэффициентов.\nИспользуйте его что не выкачивать содержимое понапрасну\n\nЧтобы за раз отслеживать все матчи, где изменились коэффициенты, используйте [/updates-only](#tag/odds/get/Odds/live-changes/{gameId}/updates-only)",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "description": "Id матча",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "markets",
+            "in": "query",
+            "description": "Id рынка (один или несколько через запятую)",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "outcomes",
+            "in": "query",
+            "description": "Id исхода (один или несколько через запятую)",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiMarketChangeHistory[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/prematch-markets": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "Типы доматчевых ставок",
+        "description": "Справочинк видов ставок для доматчевых коэффициентов (получаемыйх черех [/odds](#tag/odds/get/Odds/{gameId})\nЭти виды ставок используются как `MarketId`",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Odds/live-markets": {
+      "get": {
+        "tags": [
+          "Odds"
+        ],
+        "summary": "Типы Live ставок",
+        "description": "Справочинк видов ставок для Live коэффициентов (получаемыйх черех [/odds/live](#tag/odds/get/Odds/live/{gameId})\nЭти виды ставок используются как `MarketId`",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Players/find": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "summary": "Поиск игрока",
+        "description": "Выполняет поиск футболистов по имени или его части. Поиск не чувствителен к регистру и находит всех игроков, \nв именах которых содержится указанная подстрока.\n\n**Особенности:**\n- Поиск выполняется по частичному совпадению\n- Регистр символов не учитывается  \n- Максимальное количество результатов: 100\n- В ответе включается информация о текущей команде игрока\n\n**Пример использования:**\n- `name=ronaldo` - найдет игроков с именем, содержащим \"Ronaldo\"\n- `name=John` - найдет всех игроков с именем, содержащим \"John\"",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Имя или часть имени игрока для поиска (минимум 1 символ)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaPlayerWithTeam[]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Players/{id}": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "summary": "Данные по игроку",
+        "description": "Полные данные по игроку: текущая команда и история трансферов",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaPlayerFull"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Players/{id}/events": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "summary": "События игрока",
+        "description": "Возвращает список событий указанного игрока в хронологическом порядке.\n\n**По умолчанию включает события где игрок:**\n- Является основным участником (голы, карточки, замены и т.д.)\n\n**При включении `includeAssists = true` дополнительно включает:**\n- События где игрок выступает в роли ассистента\n\nСобытия сортируются по дате матча (новые сначала), затем по времени в матче.\nПоддерживается пагинация для работы с большими объемами данных.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Уникальный идентификатор игрока",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "includeAssists",
+            "in": "query",
+            "description": "Включать ли события где игрок является ассистентом (по умолчанию false)",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Количество записей для пропуска (для пагинации)",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Максимальное количество записей в ответе (1-1000)",
+            "schema": {
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaEvent[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Teams/list": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Список команд",
+        "description": "Список команд с возможностью фильтрации и пагинации",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "query",
+            "description": "Название команды",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 2,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Country",
+            "in": "query",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "pattern": "^[\\w\\/\\-]+(?:,[\\w\\/\\-]+)*$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaTeam[]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Teams/{id}": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Получает детальную информацию о команде по ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Идентификатор команды",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfApiSaTeamFull"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountInfo": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string"
+          }
+        },
+        "nullable": true
+      },
+      "ApiGameGlicko": {
+        "required": [
+          "fixture",
+          "glicko"
+        ],
+        "type": "object",
+        "properties": {
+          "fixture": {
+            "$ref": "#/components/schemas/ApiSaGame"
+          },
+          "glicko": {
+            "$ref": "#/components/schemas/ApiGlicko"
+          }
+        },
+        "nullable": true
+      },
+      "ApiGlicko": {
+        "type": "object",
+        "properties": {
+          "homeRating": {
+            "type": "number",
+            "format": "float"
+          },
+          "homeRd": {
+            "type": "number",
+            "format": "float"
+          },
+          "awayRating": {
+            "type": "number",
+            "format": "float"
+          },
+          "awayRd": {
+            "type": "number",
+            "format": "float"
+          },
+          "homeXg": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "awayXg": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "homeWinProbability": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "awayWinProbability": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "homeVolatility": {
+            "type": "number",
+            "format": "float"
+          },
+          "awayVolatility": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ApiLiveOddsLastUpdate": {
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiMarketChangeHistory": {
+        "type": "object",
+        "properties": {
+          "marketId": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "marketName": {
+            "type": "string"
+          },
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiOutcomeChanges"
+            }
+          }
+        }
+      },
+      "ApiMarketProfit": {
+        "required": [
+          "market",
+          "outcomes"
+        ],
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "string"
+          },
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiTeamOutcomeProfit"
+            }
+          }
+        }
+      },
+      "ApiMatchProfit": {
+        "required": [
+          "home",
+          "homeFirstHalf",
+          "homeSecondHalf",
+          "away",
+          "awayFirstHalf",
+          "awaySecondHalf"
+        ],
+        "type": "object",
+        "properties": {
+          "home": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiMarketProfit"
+            },
+            "description": "Профит команды хозяев за основное время"
+          },
+          "homeFirstHalf": {
+            "type": "array",
+            "items": {},
+            "description": "Профит команды хозяев за первые таймы"
+          },
+          "homeSecondHalf": {
+            "type": "array",
+            "items": {},
+            "description": "Профит команды хозяев за вторые таймы"
+          },
+          "away": {
+            "type": "array",
+            "items": {},
+            "description": "Профит команды гостей за основное время"
+          },
+          "awayFirstHalf": {
+            "type": "array",
+            "items": {},
+            "description": "Профит команды гостей за первые таймы"
+          },
+          "awaySecondHalf": {
+            "type": "array",
+            "items": {},
+            "description": "Профит команды гостей за вторые таймы"
+          }
+        },
+        "nullable": true
+      },
+      "ApiOddsValueChange": {
+        "type": "object",
+        "properties": {
+          "elapsedSeconds": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "createdTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ApiOutcomeChanges": {
+        "type": "object",
+        "properties": {
+          "outcomeId": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "outcomeName": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiOddsValueChange"
+            }
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {},
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfAccountInfo": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AccountInfo"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiGameGlicko": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiGameGlicko"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiLiveOddsLastUpdate[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiLiveOddsLastUpdate"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiMarketChangeHistory[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiMarketChangeHistory"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiMatchProfit": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiMatchProfit"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaBookmaker[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaBookmaker"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaBookmakerOdds[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaBookmakerOdds"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaEvent[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaEvent"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaGame[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaGame"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaGameFull": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiSaGameFull"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaLeagueWithSeasons[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaLeagueWithSeasons"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaLiveOdds": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiSaLiveOdds"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaPlayerFull": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiSaPlayerFull"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaPlayerWithTeam[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaPlayerWithTeam"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaTeam[]": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaTeam"
+            },
+            "nullable": true
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfApiSaTeamFull": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiSaTeamFull"
+          },
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiResponseOfObject": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "data": {},
+          "requestQuery": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "traceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaBet": {
+        "type": "object",
+        "properties": {
+          "marketId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "marketName": {
+            "type": "string"
+          },
+          "odds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Price"
+            }
+          }
+        }
+      },
+      "ApiSaBookmaker": {
+        "required": [
+          "id",
+          "bookmakerName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bookmakerName": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiSaBookmakerOdds": {
+        "type": "object",
+        "properties": {
+          "bookmakerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bookmakerName": {
+            "type": "string"
+          },
+          "odds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaBet"
+            }
+          }
+        }
+      },
+      "ApiSaCountry": {
+        "required": [
+          "code",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Уникальный двухзначный код страны (alpha-2)"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "elapsed": {
+            "type": "integer",
+            "description": "Минута матча",
+            "format": "uint8"
+          },
+          "extra": {
+            "type": "integer",
+            "description": "Добавленное время (в минутах)",
+            "format": "uint8",
+            "nullable": true
+          },
+          "type": {
+            "type": "integer",
+            "description": "Тип события: (1 - гол, 2 - карточка, 3 - замена,  4 - VAR)\n<remarks>Конкретное название события в Name</remarks>",
+            "format": "uint8"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название события\n<remarks>(Normal Goal, Own Goal, Penalty, Missed Penalty, Yellow Card, Red card, Substitution, Goal cancelled, Penalty confirmed)</remarks>"
+          },
+          "player": {
+            "$ref": "#/components/schemas/ApiSaPlayer"
+          },
+          "assistPlayer": {
+            "$ref": "#/components/schemas/ApiSaPlayer"
+          }
+        }
+      },
+      "ApiSaGame": {
+        "required": [
+          "homeTeam",
+          "awayTeam"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "flashId": {
+            "type": "string",
+            "description": "Id матча с сайта Flashscore",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "description": "Время начала матча",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateUtc": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "description": "Статус матча",
+            "format": "uint8",
+            "nullable": true
+          },
+          "statusName": {
+            "type": "string",
+            "description": "Название статуса",
+            "nullable": true
+          },
+          "homeResult": {
+            "type": "integer",
+            "description": "Счет хозяев в матче до начала пенальти (учитывает основное время и дополнительное). Счет пенальти не учитывает",
+            "format": "int32",
+            "nullable": true
+          },
+          "awayResult": {
+            "type": "integer",
+            "description": "Счет гостей в матче до начала пенальти (учитывает основное время и дополнительное). Счет пенальти не учитывает",
+            "format": "int32",
+            "nullable": true
+          },
+          "homeHTResult": {
+            "type": "integer",
+            "description": "Счет хозяев в первом тайме",
+            "format": "int32",
+            "nullable": true
+          },
+          "awayHTResult": {
+            "type": "integer",
+            "description": "Счет гостей в первом тайме",
+            "format": "int32",
+            "nullable": true
+          },
+          "homeFTResult": {
+            "type": "integer",
+            "description": "Счет хозяев в основном времени",
+            "format": "int32",
+            "nullable": true
+          },
+          "awayFTResult": {
+            "type": "integer",
+            "description": "Счет гостей в основном времени",
+            "format": "int32",
+            "nullable": true
+          },
+          "homeTeam": {
+            "$ref": "#/components/schemas/ApiSaTeam"
+          },
+          "awayTeam": {
+            "$ref": "#/components/schemas/ApiSaTeam"
+          },
+          "season": {
+            "$ref": "#/components/schemas/ApiSaSeason"
+          },
+          "roundName": {
+            "type": "string",
+            "nullable": true
+          },
+          "odds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaBet"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaGameFull": {
+        "required": [
+          "game"
+        ],
+        "type": "object",
+        "properties": {
+          "game": {
+            "$ref": "#/components/schemas/ApiSaGame"
+          },
+          "statistics": {
+            "$ref": "#/components/schemas/ApiSaStatistics"
+          },
+          "lineups": {
+            "$ref": "#/components/schemas/ApiSaLineup"
+          },
+          "lineupPlayers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaLineupPlayer"
+            },
+            "nullable": true
+          },
+          "playerStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaPlayerStats"
+            },
+            "nullable": true
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaEvent"
+            },
+            "nullable": true
+          },
+          "venue": {
+            "$ref": "#/components/schemas/ApiSaVenue"
+          },
+          "refereeName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaLeague": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "$ref": "#/components/schemas/ApiSaCountry"
+          },
+          "flashScoreId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaLeagueWithSeasons": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "$ref": "#/components/schemas/ApiSaCountry"
+          },
+          "flashScoreId": {
+            "type": "string",
+            "nullable": true
+          },
+          "seasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaSeasonFull"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaLineup": {
+        "type": "object",
+        "properties": {
+          "homeFormation": {
+            "type": "string",
+            "description": "Расстановка хозяев",
+            "nullable": true
+          },
+          "awayFormation": {
+            "type": "string",
+            "description": "Расстановка гостей",
+            "nullable": true
+          },
+          "homeCoach": {
+            "$ref": "#/components/schemas/ApiSaPlayer"
+          },
+          "awayCoach": {
+            "$ref": "#/components/schemas/ApiSaPlayer"
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaLineupPlayer": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "playerName": {
+            "type": "string"
+          },
+          "position": {
+            "maxLength": 1,
+            "minLength": 1,
+            "type": "string",
+            "format": "char",
+            "nullable": true
+          },
+          "grid": {
+            "type": "string"
+          },
+          "startXI": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaLiveOdds": {
+        "type": "object",
+        "properties": {
+          "elapsed": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string",
+            "description": "Время матча в формате (ЧЧ:ММ:СС) 01:31:25 = 91-ая минута, 25 секунда"
+          },
+          "stopped": {
+            "type": "boolean"
+          },
+          "finished": {
+            "type": "boolean"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "gameStatus": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "odds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaBet"
+            }
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaPlayer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaPlayer2": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiSaPlayerFull": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "currentTeam": {
+            "$ref": "#/components/schemas/ApiSaTeam2"
+          },
+          "transfers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaPlayerTransfer"
+            },
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaPlayerStats": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "capitan": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "substitute": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "offsides": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsTotal": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsOn": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "goalsTotal": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "goalsConceded": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "goalsAssists": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "goalsSaves": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "passesTotal": {
+            "type": "integer",
+            "format": "int16",
+            "nullable": true
+          },
+          "passesKey": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "passesAccuracy": {
+            "type": "integer",
+            "format": "int16",
+            "nullable": true
+          },
+          "tacklesTotal": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "tacklesBlocks": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "tacklesInterceptions": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "duelsTotal": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "duelsWon": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "dribblesAttempts": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "dribblesSuccess": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "dribblesPast": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "foulsDrawn": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "foulsCommitted": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "cardsYellow": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "cardsRed": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "penaltyWon": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "penaltyCommited": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "penaltyScored": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "penaltyMissed": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "penaltySaved": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "rating": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaPlayerTransfer": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/ApiSaTeam2"
+          },
+          "to": {
+            "$ref": "#/components/schemas/ApiSaTeam2"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaPlayerWithTeam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "team": {
+            "$ref": "#/components/schemas/ApiSaTeam2"
+          }
+        }
+      },
+      "ApiSaSeason": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "league": {
+            "$ref": "#/components/schemas/ApiSaLeague"
+          }
+        }
+      },
+      "ApiSaSeasonFull": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "league": {
+            "$ref": "#/components/schemas/ApiSaLeague"
+          },
+          "dateStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "flashScoreId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiSaStatistics": {
+        "type": "object",
+        "properties": {
+          "shotsOnGoalHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsOnGoalAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsOffGoalHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsOffGoalAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "totalShotsHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "totalShotsAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "blockedShotsHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "blockedShotsAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsInsideBoxHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsInsideBoxAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsOutsideBoxHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "shotsOutsideBoxAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "foulsHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "foulsAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "cornerKicksHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "cornerKicksAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "ballPossessionHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "ballPossessionAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "yellowCardsHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "yellowCardsAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "goalkeeperSavesHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "goalkeeperSavesAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "totalPassesHome": {
+            "type": "integer",
+            "format": "int16",
+            "nullable": true
+          },
+          "totalPassesAway": {
+            "type": "integer",
+            "format": "int16",
+            "nullable": true
+          },
+          "passesAccurateHome": {
+            "type": "integer",
+            "format": "int16",
+            "nullable": true
+          },
+          "passesAccurateAway": {
+            "type": "integer",
+            "format": "int16",
+            "nullable": true
+          },
+          "offsidesHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "offsidesAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "redCardsHome": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          },
+          "redCardsAway": {
+            "type": "integer",
+            "format": "uint8",
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaTeam": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "flashId": {
+            "type": "string",
+            "description": "Id команды с сайта Flashscore ",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/ApiSaCountry"
+          }
+        }
+      },
+      "ApiSaTeam2": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "flashId": {
+            "type": "string",
+            "description": "Id команды с сайта Flashscore ",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/ApiSaCountry"
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaTeamFull": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "flashId": {
+            "type": "string",
+            "description": "Id команды с сайта Flashscore ",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/ApiSaCountry"
+          },
+          "code": {
+            "type": "string",
+            "description": "Сокращенная аббревиатура команды",
+            "nullable": true
+          },
+          "founded": {
+            "type": "integer",
+            "description": "Год основания команды",
+            "format": "int32",
+            "nullable": true
+          },
+          "seasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaSeason"
+            },
+            "description": "Сезоны команды",
+            "nullable": true
+          },
+          "venue": {
+            "$ref": "#/components/schemas/ApiSaVenue2"
+          },
+          "coach": {
+            "$ref": "#/components/schemas/ApiSaPlayer"
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSaPlayer2"
+            },
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaVenue": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ApiSaVenue2": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "description": "Стадион",
+        "nullable": true
+      },
+      "ApiTeamOutcomeProfit": {
+        "required": [
+          "name",
+          "profit",
+          "profitHistory",
+          "gamesCount",
+          "winCount"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название исхода ставки "
+          },
+          "profit": {
+            "type": "number",
+            "description": "Величина прибыли",
+            "format": "float"
+          },
+          "profitHistory": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Динамика прибыли (изменение с каждым матчем)"
+          },
+          "gamesCount": {
+            "type": "integer",
+            "description": "Суммарное количество всех матчей",
+            "format": "int32"
+          },
+          "winCount": {
+            "type": "integer",
+            "description": "Количество матчей, где ставка зашла",
+            "format": "int32"
+          }
+        }
+      },
+      "Price": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "QueryGamesRequest": {
+        "required": [
+          "condition"
+        ],
+        "type": "object",
+        "properties": {
+          "condition": {
+            "type": "string",
+            "description": "Условие фильтра\r\n\r\nКомбинация логических условий",
+            "example": "League = 41 AND Year = 2023"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Поля для вывода (json массив)",
+            "nullable": true,
+            "example": "[ \"Id\", \"HomeTeamName\", \"AwayTeamName\", \"Date\"]"
+          },
+          "format": {
+            "type": "string",
+            "description": "Формат вывода: csv, json",
+            "default": "json",
+            "nullable": true
+          },
+          "timezone": {
+            "type": "integer",
+            "description": "Временная зона",
+            "format": "int32",
+            "default": 3,
+            "nullable": true,
+            "example": "3"
+          },
+          "order": {
+            "type": "string",
+            "description": "Поле по которому будет сортировка. Если необходима сортировка по убыванию, то перед полем необходимо выставить '-'\nПо умолчанию по времени начала матча, по возрастанию.\n<example>Пример: <code>-Date</code> - сортировка по убыванию времени начала матча</example>",
+            "default": "Date",
+            "nullable": true
+          },
+          "offset": {
+            "maximum": 2147483647,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Смещение выборки от начала",
+            "format": "int32"
+          },
+          "limit": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiAuthScheme": {
+        "type": "apiKey",
+        "description": "API key в query string, например: ?apikey=<my_api_key>",
+        "name": "apikey",
+        "in": "query"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "Аккаунт\r\n\r\nДанные об аккаунте и API токена\n            \n**Требуется авторизация по API ключу**\n            \n[Инструкция по авторизации](https://sstats.net/posts/api-auth)",
+      "x-displayName": "Аккаунт"
+    },
+    {
+      "name": "Excel",
+      "description": "Excel таблицы\r\n\r\nДанные запросы используются в таблицах Excel, получивших популярность в народе, предназначенных для анализа предсказания футбольных матчей.\nОригинальные таблицы были модифицированы, заменив парсер сайта Flashscore.com на API sstats.net\n            \nЭто API так же может быть полезно для использования в других таблицах",
+      "x-displayName": "Excel таблицы"
+    },
+    {
+      "name": "Games",
+      "description": "Матчи\r\n\r\nНовые матчи добавляются несколько раз в день. Обновление доматчевой информации по конкретному матчу происходит раз в 3 часа ",
+      "x-displayName": "Матчи"
+    },
+    {
+      "name": "Leagues",
+      "description": "Лиги\r\n\r\nЛиги и турниры",
+      "x-displayName": "Лиги"
+    },
+    {
+      "name": "Ls",
+      "description": "Flashscore\r\n\r\nДанные с сайта Flashscore",
+      "x-displayName": "Flashscore"
+    },
+    {
+      "name": "Odds",
+      "description": "Коэффициенты",
+      "x-displayName": "Коэффициенты"
+    },
+    {
+      "name": "Players",
+      "description": "Игроки",
+      "x-displayName": "Игроки"
+    },
+    {
+      "name": "Teams",
+      "description": "Команды",
+      "x-displayName": "Команды"
+    }
+  ]
+}
